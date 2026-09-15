@@ -19,19 +19,17 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from baselines.scripts._revision_utils import append_tracker, write_json
+from baselines.scripts._utils import append_tracker, write_json
 
 
 def fail_note(reason: str, output_dir: Path) -> None:
-    note = ROOT / "baselines" / "notes" / "learned_baseline_failure.md"
+    note = output_dir / "training_failure.md"
     note.parent.mkdir(parents=True, exist_ok=True)
     note.write_text(
         "# Learned Baseline Failure\n\n"
         f"Attempt time: {datetime.now().isoformat(timespec='seconds')}\n\n"
         f"Reason: {reason}\n\n"
-        "No learned-baseline result is claimed. The available SwinIR L1-only "
-        "ablation remains a related internal learned comparison, but it is not "
-        "a compact external baseline.\n",
+        "This training attempt did not produce a completed model run.\n",
         encoding="utf-8",
     )
     append_tracker({
@@ -67,7 +65,7 @@ def main() -> None:
     from src.config import PROCESSED_DIR
     processed = PROCESSED_DIR
     if not processed.exists():
-        fail_note("`data/processed` does not exist in this local checkout.", args.output_dir)
+        fail_note(f"Processed-array directory is missing: {processed}", args.output_dir)
         raise SystemExit(2)
 
     import numpy as np

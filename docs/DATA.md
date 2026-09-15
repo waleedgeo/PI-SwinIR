@@ -16,7 +16,7 @@ Preprocessing and inference expect a **nine-band float32 GeoTIFF at 10 m**, with
 | 8 | HAND | Metres |
 | 9 | Roads | Binary 0/1 |
 
-Loaders **do not decode scaled Int16 exports**. Historical exports used SAR `/100`, optical `/10000`, and elevation/HAND `/100`; decode those before use while preserving NoData, after verifying the actual source scales. `src.prepare_data` is a historical scaled-export validator, not an automatic conversion workflow. Use prepared physical-unit float32 rasters with `src.preprocess` and `src.inference`.
+Loaders **do not decode scaled Int16 exports**. Historical exports used SAR `/100`, optical `/10000`, and elevation/HAND `/100`; decode those before use while preserving NoData, after verifying the actual source scales. Export conversion is outside this release. Use prepared physical-unit float32 rasters with `src.preprocess` and `src.inference`.
 
 ## Normalization
 

@@ -3,6 +3,11 @@ __pycache__/
 .venv/
 venv/
 .env
+.env.*
+!.env.example
+*.pem
+*.key
+*service-account*.json
 *.log
 .DS_Store
 Thumbs.db

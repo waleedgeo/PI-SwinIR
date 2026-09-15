@@ -10,6 +10,7 @@ Completed locally on Windows with Python 3.11.14, PyTorch 2.9.1+cu130, Rasterio 
 | Production checkpoint preserved byte-for-byte | Passed |
 | Complete tile coverage and anchor reconstruction on 17 × 25, 128 × 128, 129 × 173 and 257 × 301 grids | Passed |
 | Preprocessing/inference normalization agreement and input NoData footprint | Passed |
+| Diagnostic plot elevations in metres, reference alignment and preservation of valid zero elevation | Passed |
 | Composite loss with finite, nonzero gradients | Passed |
 | Synthetic 256 × 256 production-model GPU inference and GeoTIFF evaluation | Passed |
 | Output CRS, transform, dimensions and NoData restoration | Passed |

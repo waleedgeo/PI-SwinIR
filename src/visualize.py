@@ -236,8 +236,8 @@ def plot_model_diagram(cfg, output_dir: str | None = None):
 
     blocks.extend([
         ("Deep\nFeature\nFusion", last_rstb_x + 1.2, 1.0, PALETTE["green"], f"Conv 3×3\n{cfg.embed_dim}d"),
-        ("Gated\nResidual (+)", last_rstb_x + 2.5, 0.9, PALETTE["gold"], "σ(G)·FABDEM\n+ correction"),
-        ("Recon\nHead", last_rstb_x + 3.6, 0.8, PALETTE["red"], "Conv→64→1"),
+        ("Recon\nHead", last_rstb_x + 2.5, 0.8, PALETTE["red"], "Conv→64→1"),
+        ("Gated\nResidual (+)", last_rstb_x + 3.6, 0.9, PALETTE["gold"], "σ(G)·FABDEM\n+ correction"),
         ("Output\nDEM 10m", last_rstb_x + 4.8, 1.0, "#fce4ec", "128×128×1"),
     ])
 
@@ -505,20 +505,18 @@ def plot_inference_result(pred_path: str, features_path: str | None = None,
 
     # ── Read prediction ──
     with rasterio.open(pred_path) as src:
-        pred = src.read(1).astype(np.float32)
+        pred = src.read(1, masked=True).filled(np.nan).astype(np.float32)
         pred_profile = src.profile.copy()
 
-    # ── Mask NoData corners (CRS tilt artefacts) ──
-    # Treat exactly 0.0 at the borders as NoData (projection fill value)
-    nodata_mask = (pred == 0) | ~np.isfinite(pred)
+    # Zero is a valid elevation; use raster metadata and nonfinite values.
+    nodata_mask = ~np.isfinite(pred)
     pred[nodata_mask] = np.nan
 
-    # ── Load & convert FABDEM (Int16 ×100 → metres) ──
+    # ── Load prepared FABDEM in metres ──
     fabdem = None
     if features_path and Path(features_path).exists():
         with rasterio.open(features_path) as src:
-            fabdem_raw = src.read(FABDEM_CHANNEL_IDX + 1).astype(np.float32)
-        fabdem = fabdem_raw / 100.0   # Int16 ×100 → metres
+            fabdem = src.read(FABDEM_CHANNEL_IDX + 1, masked=True).filled(np.nan).astype(np.float32)
         fabdem[nodata_mask] = np.nan  # apply same mask
 
     # ── Load Ground Truth (if available) ──
@@ -580,7 +578,7 @@ def plot_inference_result(pred_path: str, features_path: str | None = None,
         ax4 = fig.add_subplot(gs[1, 0])
         im4 = ax4.imshow(fabdem, cmap="terrain", vmin=vmin, vmax=vmax,
                          interpolation="bilinear")
-        ax4.set_title("(d) FABDEM Input (30 m)", fontweight="bold", loc="left")
+        ax4.set_title("(d) FABDEM Input (10 m grid)", fontweight="bold", loc="left")
         ax4.set_xticks([]); ax4.set_yticks([])
         plt.colorbar(im4, ax=ax4, label="Elevation (m)", fraction=0.046)
 
@@ -637,63 +635,9 @@ def plot_inference_result(pred_path: str, features_path: str | None = None,
 
 
 def _load_gt_for_viz(gt_path, ref_profile):
-    """Load 1m ground truth, aggregate to 10m, reproject to match reference."""
-    import rasterio
-    from rasterio.enums import Resampling
-    from rasterio.warp import reproject
-
-    with rasterio.open(gt_path) as src:
-        raw = src.read(1).astype(np.float32)
-        gt_crs = src.crs
-        gt_transform = src.transform
-        native_res = abs(src.res[0])
-        nodata = src.nodata
-
-    if nodata is not None:
-        raw[raw == nodata] = np.nan
-    raw = raw / 100.0   # Int16 ×100 → metres
-
-    # Average pool to 10m
-    factor = max(1, int(round(10.0 / native_res)))
-    if factor > 1:
-        h_trim = (raw.shape[0] // factor) * factor
-        w_trim = (raw.shape[1] // factor) * factor
-        raw = raw[:h_trim, :w_trim]
-        blocks = raw.reshape(h_trim // factor, factor,
-                             w_trim // factor, factor)
-        with np.errstate(all="ignore"):
-            pooled = np.nanmean(blocks, axis=(1, 3))
-    else:
-        pooled = raw
-
-    pooled_h, pooled_w = pooled.shape
-    pooled_transform = rasterio.transform.from_bounds(
-        *rasterio.transform.array_bounds(
-            raw.shape[0] if factor <= 1 else h_trim,
-            raw.shape[1] if factor <= 1 else w_trim,
-            gt_transform,
-        ), pooled_w, pooled_h,
-    )
-
-    dst_crs       = ref_profile["crs"]
-    dst_transform = ref_profile["transform"]
-    dst_w, dst_h  = ref_profile["width"], ref_profile["height"]
-
-    gt_aligned = np.empty((dst_h, dst_w), dtype=np.float32)
-    gt_aligned[:] = np.nan
-
-    reproject(
-        source=pooled,
-        destination=gt_aligned,
-        src_transform=pooled_transform,
-        src_crs=gt_crs,
-        dst_transform=dst_transform,
-        dst_crs=ref_profile["crs"],
-        resampling=Resampling.bilinear,
-        dst_nodata=np.nan,
-    )
-
-    return gt_aligned
+    """Load reference elevations in metres and align using the evaluation loader."""
+    from src.evaluate import load_gt_and_align
+    return load_gt_and_align(gt_path, ref_profile)
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -789,10 +733,10 @@ Examples:
     parser.add_argument("--features", type=str, default=None,
                         help="Path to features GeoTIFF (for FABDEM baseline)")
     parser.add_argument("--gt", type=str, default=None,
-                        help="Path to ground truth GeoTIFF (1m, Int16 ×100)")
+                        help="Path to ground truth GeoTIFF in metres")
     parser.add_argument("--city", type=str, default="Unknown")
     parser.add_argument("--output-dir", type=str, default=None)
-    parser.add_argument("--profile", type=str, default="test",
+    parser.add_argument("--profile", type=str, default="l4_full",
                         help="Profile name (for model diagram)")
 
     args = parser.parse_args()
@@ -843,10 +787,11 @@ Examples:
             for tif in tifs:
                 city = tif.stem.replace("_Predicted_DEM_10m", "")
                 feats = RAW_DIR / f"{city}_Features_10m.tif"
-                gt_f  = RAW_DIR / f"{city}_GroundTruth_1m.tif"
+                gt_candidates = sorted(RAW_DIR.glob(f"{city}_GroundTruth_*.tif"))
+                gt_f = gt_candidates[0] if gt_candidates else None
                 plot_inference_result(str(tif),
                                      str(feats) if feats.exists() else None,
-                                     gt_path=str(gt_f) if gt_f.exists() else None,
+                                     gt_path=str(gt_f) if gt_f is not None else None,
                                      city=city, output_dir=out)
 
     if args.mode in ("profiles", "all"):

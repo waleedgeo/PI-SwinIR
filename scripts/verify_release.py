@@ -4,6 +4,7 @@ import hashlib
 import json
 import sys
 import tempfile
+from unittest.mock import patch
 import numpy as np
 import rasterio
 import torch
@@ -74,7 +75,36 @@ def main():
         np.testing.assert_allclose(actual, expected, atol=1e-7)
         assert mask.sum() == 1 and mask[0, 0]
         assert np.isfinite(actual).all()
+        # Plotting must use the same metre-based contract and retain sea level.
+        from src.visualize import plot_inference_result, _load_gt_for_viz
+        import matplotlib.pyplot as plt
+        pred_path = Path(tmp) / 'prediction.tif'
+        gt_path = Path(tmp) / 'reference.tif'
+        elevation = np.full((16, 24), 23, dtype=np.float32)
+        elevation[0, 0] = np.nan
+        elevation[1, 1] = 0
+        with rasterio.open(path) as src:
+            profile = src.profile.copy()
+        profile.update(count=1, nodata=np.nan)
+        for output_path in [pred_path, gt_path]:
+            with rasterio.open(output_path, 'w', **profile) as dst:
+                dst.write(elevation, 1)
+        aligned = _load_gt_for_viz(gt_path, profile)
+        np.testing.assert_allclose(aligned, elevation, atol=1e-6, equal_nan=True)
+        def inspect_figure(fig, output_path, label):
+            panels = {ax.get_title(loc='left'): ax for ax in fig.axes if ax.images}
+            pred_panel = panels['(a) Predicted DEM (10 m)'].images[0].get_array()
+            fab_panel = panels['(d) FABDEM Input (10 m grid)'].images[0].get_array()
+            gt_panel = panels['(e) Ground Truth (LiDAR)'].images[0].get_array()
+            assert not np.ma.getmaskarray(pred_panel)[1, 1] and pred_panel[1, 1] == 0
+            assert fab_panel[2, 2] == 23 and gt_panel[2, 2] == 23
+            assert np.ma.getmaskarray(pred_panel)[0, 0]
+            plt.close(fig)
+        with patch('src.visualize._save_fig', side_effect=inspect_figure) as saver:
+            plot_inference_result(pred_path, path, gt_path, city='Synthetic', output_dir=tmp)
+            assert saver.call_count == 1
     print('PASS matching training/inference normalization and NoData footprint')
+    print('PASS plotting in metres, reference alignment and preservation of zero elevation')
 
     pred = torch.rand(1, 1, 32, 32, requires_grad=True)
     target = torch.rand_like(pred)

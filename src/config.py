@@ -85,14 +85,12 @@ IDX_FABDEM = 6
 IDX_HAND   = 7
 IDX_ROADS  = 8
 
-# GEE export scale factors
+# Historical GEE export scales, for provenance only; loaders expect physical units.
 SCALE_SAR    = 100.0    # SAR dB × 100 → Int16
 SCALE_S2     = 10000.0  # S2 reflectance × 10000 → Int16
 SCALE_ELEV   = 100.0    # FABDEM / GT / HAND metres × 100 → Int16
 
-# Normalisation ranges (physical units after Int16 decoding)
-# Data-driven: computed by scan_elevation_range.py across all 4 cities
-# with 5% margin.  Int16 ceiling is 327.67 m (32767/100).
+# Fixed normalization bounds used with the released checkpoint.
 SAR_MIN, SAR_MAX   = -32.0,   44.0    # dB  (actual: -27.84 … +39.97)
 ELEV_MIN, ELEV_MAX = -150.0, 500.0    # metres (widened for Rotterdam <0m, higher terrain)
 HAND_MIN, HAND_MAX =    0.0, 500.0    # metres (widened for new city range)
@@ -503,7 +501,7 @@ PROFILES = {
 
     # ── M0: L1-only baseline (no physics losses) ──
     # Tests: how much do physics-informed losses contribute?
-    # Expected: higher MAE/RMSE, worse slope preservation.
+    # Compare measured elevation and terrain metrics against the full objective.
     "ablation_l1_only": TrainingProfile(
         name="ablation_l1_only",
         embed_dim=96,
@@ -536,7 +534,7 @@ PROFILES = {
 
     # ── M4-A: No flow accumulation loss ──
     # Tests: does flow routing loss improve hydrological consistency?
-    # Expected: worse stream network recovery, similar MAE.
+    # Evaluate the contribution of flow regularization without assuming its effect.
     "ablation_no_flow": TrainingProfile(
         name="ablation_no_flow",
         embed_dim=96,
@@ -569,7 +567,7 @@ PROFILES = {
 
     # ── M4-B: No curvature loss ──
     # Tests: does curvature loss improve surface smoothness & terrain shape?
-    # Expected: rougher predictions, worse visual quality.
+    # Evaluate the contribution of curvature regularization.
     "ablation_no_curv": TrainingProfile(
         name="ablation_no_curv",
         embed_dim=96,

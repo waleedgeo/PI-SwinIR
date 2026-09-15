@@ -19,6 +19,8 @@ The actual prediction is `gate * FABDEM + residual`. Terrain losses use normaliz
 
 The repository copy keeps architecture, weights and objectives, while configuring local data roots, disabling author-bucket uploads by default, honoring explicit city output paths, resolving Sydney reference filenames, exposing device/batch size, separating diagnostic outputs and fixing tile coverage below one tile. Fixed-path manuscript plotting and placeholder baseline-evaluation scripts were omitted. These changes do not alter the active research workspace or retroactively recompute historical scores.
 
+Final public review also removed the obsolete scaled-export validator and internal revision labels, updated utility examples to the released profile, and corrected diagnostic plotting to use prepared elevations in metres while preserving valid zero elevation. Plot reference alignment reuses the evaluation loader.
+
 Actual checks are recorded in [RELEASE_VALIDATION.md](RELEASE_VALIDATION.md). For future runs record Git commit, checkpoint checksum, environment, input extent/grid/mask and data versions.
 
 ## Remaining submission materials

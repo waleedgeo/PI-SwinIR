@@ -480,7 +480,7 @@ def evaluate_city(pred_path, gt_path, features_path, out_dir, city=""):
     Parameters
     ----------
     pred_path     : predicted DEM GeoTIFF (metres)
-    gt_path       : ground-truth 1m DEM (Int16 ×100)
+    gt_path       : ground-truth elevation GeoTIFF in metres
     features_path : Features_10m.tif (for FABDEM baseline)
     out_dir       : output directory for results
     city          : name string for plot titles

@@ -1,4 +1,4 @@
-"""Compact residual CNN baseline for PI-SwinIR emergency revision."""
+"""Residual CNN baseline for same-grid DEM elevation refinement."""
 
 from __future__ import annotations
 

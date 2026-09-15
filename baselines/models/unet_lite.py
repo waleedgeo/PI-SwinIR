@@ -1,4 +1,4 @@
-"""Compact U-Net baseline for PI-SwinIR emergency revision.
+"""U-Net baseline for same-grid DEM elevation refinement.
 
 Input and target are same-grid normalized DEM tensors. The model predicts a
 residual correction anchored to the FABDEM channel by default.

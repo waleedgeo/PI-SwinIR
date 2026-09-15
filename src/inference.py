@@ -415,12 +415,15 @@ def run_inference(features_path, checkpoint_path, output_path,
         from src.visualize import plot_inference_result
         from src.config import RAW_DIR
         city_name = Path(features_path).stem.replace("_Features_10m", "")
-        gt_f = RAW_DIR / f"{city_name}_GroundTruth_1m.tif"
+        gt_candidates = sorted(Path(features_path).parent.glob(f"{city_name}_GroundTruth_*.tif"))
+        if not gt_candidates:
+            gt_candidates = sorted(RAW_DIR.glob(f"{city_name}_GroundTruth_*.tif"))
+        gt_f = gt_candidates[0] if gt_candidates else None
         print(f"  Generating inference figures ...")
         plot_inference_result(
             str(Path(output_path)),
             str(features_path),
-            gt_path=str(gt_f) if gt_f.exists() else None,
+            gt_path=str(gt_f) if gt_f is not None else None,
             city=city_name,
             output_dir=str(Path(output_path).parent / "figures" / Path(output_path).stem),
         )

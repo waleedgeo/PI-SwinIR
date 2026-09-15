@@ -1,4 +1,4 @@
-"""Shared helpers for emergency revision scripts."""
+"""Shared serialization and experiment-log helpers for learned baselines."""
 
 from __future__ import annotations
 
@@ -10,13 +10,13 @@ from typing import Iterable, Mapping, Sequence
 
 
 ROOT = Path(__file__).resolve().parents[2]
-REV = ROOT / "baselines"
+BASELINE_DIR = ROOT / "baselines"
 
 
 def ensure_output_dirs(output_dir: Path) -> None:
     for sub in ["tables", "figures", "metrics", "predictions", "logs"]:
         (output_dir / sub).mkdir(parents=True, exist_ok=True)
-    (REV / "notes").mkdir(parents=True, exist_ok=True)
+    (BASELINE_DIR / "notes").mkdir(parents=True, exist_ok=True)
 
 
 def json_safe(value):
@@ -70,7 +70,7 @@ def write_markdown_table(path: Path, rows: Sequence[Mapping], fieldnames: Sequen
 
 
 def append_tracker(row: Mapping) -> None:
-    path = REV / "outputs" / "experiment_tracker.csv"
+    path = BASELINE_DIR / "outputs" / "experiment_tracker.csv"
     fieldnames = [
         "experiment_id", "task", "model", "input_channels", "loss",
         "train_cities", "test_cities", "status", "start_time", "end_time",

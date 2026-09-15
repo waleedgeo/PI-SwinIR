@@ -158,7 +158,7 @@ def build_dataloaders(cfg, processed_dir=None):
     Build train and val DataLoaders using city-based splits.
 
     Split logic:
-      • Training cities (3+): per-city .npy files concatenated
+      • Available development cities: per-city .npy files concatenated
       • Validation: random 15% of training patches
       • Holdout city: separate (loaded only at inference/eval time)
       • City-balanced sampling: WeightedRandomSampler ensures equal

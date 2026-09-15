@@ -12,7 +12,7 @@ Usage (CLI):
   python -m src.utils inspect data/raw/New_Orleans_Features_10m.tif
   python -m src.utils inspect results/New_Orleans_Predicted_DEM_10m.tif
   python -m src.utils compare results/New_Orleans_Predicted_DEM_10m.tif data/raw/New_Orleans_GroundTruth_1m.tif
-  python -m src.utils infer --city New_Orleans --profile l4 --checkpoint checkpoints/best_l4.pt
+  python -m src.utils infer --city New_Orleans --profile l4_full --checkpoint checkpoints/best_l4_full.pt
 
 Usage (Python):
   from src.utils import inspect_geotiff, quick_inference
@@ -214,7 +214,7 @@ def compare_geotiffs(path_a, path_b, label_a="A", label_b="B"):
 #  2. Quick Inference
 # ═══════════════════════════════════════════════════════════════════════════
 
-def quick_inference(city, profile="l4", checkpoint=None, device=None):
+def quick_inference(city, profile="l4_full", checkpoint=None, device=None):
     """
     One-liner to run inference on a city.
     Auto-resolves feature path, checkpoint, and output path.
@@ -224,7 +224,7 @@ def quick_inference(city, profile="l4", checkpoint=None, device=None):
     city : str
         City name, e.g. 'New_Orleans'
     profile : str
-        Training profile name (l4, l4_overnight, gcp, etc.)
+        Registered training profile name (l4_full, quick, gcp, etc.).
     checkpoint : str or None
         Path to checkpoint file. If None, auto-discovers best_{profile}.pt
     device : str or None
@@ -255,8 +255,7 @@ def quick_inference(city, profile="l4", checkpoint=None, device=None):
             raise FileNotFoundError(
                 f"No checkpoint found. Looked for: {[str(c) for c in candidates]}")
 
-    if device is None:
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device(device or ("cuda" if torch.cuda.is_available() else "cpu"))
 
     print(f"\n  Quick inference: {city}")
     print(f"  Profile   : {profile}")
@@ -348,14 +347,14 @@ def main():
     from src.cli import configure_console
     configure_console()
     parser = argparse.ArgumentParser(
-        description="DEM Super-Resolution Utilities",
+        description="PI-SwinIR DEM Refinement Utilities",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
   python -m src.utils inspect data/raw/New_Orleans_Features_10m.tif
   python -m src.utils inspect results/New_Orleans_Predicted_DEM_10m.tif --band 1
   python -m src.utils compare results/pred.tif data/raw/gt.tif
-  python -m src.utils infer --city New_Orleans --profile l4
+  python -m src.utils infer --city New_Orleans --profile l4_full
   python -m src.utils upload-processed
         """
     )
@@ -378,7 +377,7 @@ Examples:
     # ── infer ──
     sp_infer = subparsers.add_parser("infer", help="Quick inference on a city")
     sp_infer.add_argument("--city", type=str, required=True)
-    sp_infer.add_argument("--profile", type=str, default="l4")
+    sp_infer.add_argument("--profile", type=str, default="l4_full")
     sp_infer.add_argument("--checkpoint", type=str, default=None)
 
     # ── compare-gt ──
