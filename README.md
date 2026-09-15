@@ -1,163 +1,75 @@
-<div align="center">
-  <img src="img/PI-SwinIR-Logo.png" alt="PI-SwinIR Logo" width="75%">
+<div align="center"><img src="img/PI-SwinIR-Logo.png" alt="PI-SwinIR" width="65%"></div>
 
-  <p align="center">
-    <strong>PI-SwinIR: A Physics-Informed Swin Transformer for Hydrology-Aware Vertical Refinement of Global DEMs from Multimodal Earth Observation Data</strong>
-    <br /><br />
-    <a href="#overview">Overview</a>
-    ·
-    <a href="#graphical-abstract">Graphical Abstract</a>
-    ·
-    <a href="#model-summary">Model Summary</a>
-    ·
-    <a href="#key-results">Key Results</a>
-    ·
-    <a href="#repository-status">Repository Status</a>
-    ·
-    <a href="#citation">Citation</a>
-    ·
-    <a href="#contact">Contact</a>
-  </p>
+# PI-SwinIR
 
-  <p align="center">
-    <img src="https://img.shields.io/badge/Status-Under%20Submission-orange?style=for-the-badge&logo=gitbook" alt="Status">
-    <img src="https://img.shields.io/badge/Method-Physics--Informed%20Deep%20Learning-blue?style=for-the-badge&logo=pytorch" alt="Method">
-    <img src="https://img.shields.io/badge/Data-Sentinel--1%20%7C%20Sentinel--2%20%7C%20FABDEM-brightgreen?style=for-the-badge" alt="Data">
-    <a href="LICENSE">
-      <img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge" alt="License">
-    </a>
-  </p>
-</div>
+**A Physics-Informed Swin Transformer for Hydrology-Aware Vertical Refinement of Global DEMs from Multimodal Earth Observation Data**
 
-<br />
+This repository provides the core computational materials for a manuscript being prepared for submission to *Computers & Geosciences*: model architecture, physics-informed losses, preprocessing, training, tiled inference, evaluation, six trained checkpoints, and CNN/U-Net baselines.
 
-## Overview
+PI-SwinIR refines elevations on a **10 m grid** using FABDEM resampled to that grid and multimodal Earth observation inputs. Its output retains the input grid dimensions.
 
-PI-SwinIR is a physics-informed deep learning framework for same-resolution vertical refinement of globally available digital elevation models (DEMs) using multimodal Earth observation data. Designed for hydrology-aware terrain modeling, the framework integrates Sentinel-1 SAR, Sentinel-2 multispectral imagery, FABDEM elevation, Height Above Nearest Drainage (HAND), road masks, and spectral indices to improve DEM vertical accuracy while preserving terrain structure relevant to drainage and surface form.
+## Start here
 
-This is **not** a generic image super-resolution method. PI-SwinIR performs **same-resolution vertical refinement** — it refines the elevation surface of existing DEMs at 10 m resolution, reducing vertical error and recovering hydrologically meaningful terrain structure that FABDEM and similar globally available products do not fully capture.
+| Guide | Contents |
+|---|---|
+| [Installation](docs/INSTALLATION.md) | Environment and runtime checks |
+| [Data](docs/DATA.md) | Bands, units, normalization, boundaries and availability |
+| [Training](docs/TRAINING.md) | Fresh training, resume and ablations |
+| [Inference](docs/INFERENCE.md) | Study cities and your own study area |
+| [Weights](checkpoints/README.md) | Six trained models and checksummed provenance |
+| [Reproducibility](docs/REPRODUCIBILITY.md) | Reviewer checks and limitations |
+| [Benchmarks](benchmarks/README.md) | Saved city metrics and training logs |
+| [Baselines](baselines/README.md) | CNNLite and UNetLite |
 
----
+## Quick start
 
-## Why This Matters
+Run commands from the repository root with Python 3.10 or 3.11. For GPU use, install a PyTorch build compatible with your GPU environment first.
 
-High-resolution, vertically accurate DEMs are essential for:
-
-- Flood mapping and inundation modeling
-- Hydrological analysis and drainage extraction
-- Geomorphological and terrain-dependent environmental assessment
-
-Globally available DEM products such as FABDEM contain residual vertical error and often fail to resolve fine-scale terrain features required for reliable 10 m applications, particularly in regions without airborne LiDAR coverage. PI-SwinIR addresses this gap by learning a hydrology-aware vertical refinement function from freely available, globally accessible Earth observation inputs.
-
----
-
-## Graphical Abstract
-
-<div align="center">
-  <img src="img/PI-SwinIR Graphical Abstract - 1920rescale.png" alt="PI-SwinIR Graphical Abstract" width="100%" style="border-radius: 10px; border: 1px solid #ddd; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-</div>
-
-> PI-SwinIR processes an 11-channel multimodal Earth observation input through a physics-informed Swin Transformer and produces a geometrically accurate, hydrologically consistent 10 m DEM refinement.
-
----
-
-## Model Summary
-
-PI-SwinIR combines a **Swin Transformer V2 backbone** with a **gated residual refinement head** to predict elevation corrections from multimodal Earth observation context. The architecture is designed to refine the source DEM surface while controlling the magnitude and spatial structure of residual updates.
-
-### Input Data
-
-The model ingests an **11-channel input stack** composed of:
-
-| Source | Channels |
-|--------|----------|
-| Sentinel-1 SAR | VV, VH |
-| Sentinel-2 multispectral | RGB, NIR |
-| FABDEM | Elevation |
-| HAND | Height Above Nearest Drainage |
-| OSM road network | Road mask |
-| Spectral indices | NDVI, NDWI |
-
-All inputs are freely available and globally reproducible, without reliance on proprietary datasets.
-
-### Physics-Informed Loss
-
-Training uses a **composite loss** that simultaneously optimizes:
-
-- **Elevation reconstruction** — reduces pixel-wise vertical error relative to the reference
-- **Slope consistency** — preserves realistic gradient magnitudes across the terrain surface
-- **Curvature consistency** — suppresses artificial smoothing and maintains ridge and valley morphology
-- **Differentiable D8 flow-routing constraints** — aligns predicted drainage paths with reference stream networks
-
-This formulation ensures that the refined DEM is not only vertically accurate, but also physically consistent with terrain behavior relevant to hydrology.
-
----
-
-## Key Results
-
-Evaluated against LiDAR-derived terrain models across **eight cities on three continents**, PI-SwinIR demonstrates robust and consistent improvements over FABDEM:
-
-- **25.3% average RMSE reduction** relative to FABDEM across all evaluation sites
-- **Sub-meter MAE in five cities**
-- **|bias| < 0.1 m in seven cities**
-- Measurable stream-network recovery at the 10 m grid
-- Strongest gains in **moderate- and high-relief terrain**
-
-The evaluation covered approximately **138 million valid 10 m pixels**, providing a large-scale, geographically diverse assessment of the model's generalization capacity.
-
----
-
-## Repository Status
-
-> The manuscript describing this methodology is currently **under submission**. The full source code, trained model weights, and inference pipeline will be made publicly available following peer review and manuscript acceptance.
-
-> For early access to the codebase for validation or research collaboration purposes, please [contact the corresponding author](#contact).
-
-### Planned Release
-
-| Component | Status | Timeline |
-|-----------|--------|----------|
-| Graphical Abstract & Logo | Available | Now |
-| Manuscript Submission | Under Review | Submitted |
-| Model Architecture Code | Restricted | Upon acceptance |
-| Pretrained Weights | Pending | Upon acceptance |
-| Training & Inference Pipeline | Pending | Upon acceptance |
-| Benchmark Dataset | Pending | Upon acceptance |
-
----
-
-## Citation
-
-If you use PI-SwinIR or its methodology in your research, please cite the following manuscript once published:
-
-```bibtex
-@article{waleed2026piswinir,
-  title={PI-SwinIR: A Physics-Informed Swin Transformer for Hydrology-Aware Vertical Refinement of Global DEMs from Multimodal Earth Observation Data},
-  author={Waleed, Mirza},
-  journal={Under Submission},
-  year={2026}
-}
+```bash
+python -m pip install -r requirements.txt
+python scripts/verify_release.py
+python scripts/make_demo_data.py --output-dir data/demo
+python -m src.inference --features data/demo/Houston_Features_10m.tif --checkpoint checkpoints/best_l4_full.pt --output results/demo/refined.tif --batch-size 1 --no-figures
+python -m src.evaluate --pred results/demo/refined.tif --gt data/demo/Houston_GroundTruth_10m.tif --features data/demo/Houston_Features_10m.tif --output-dir results/demo/evaluation
 ```
 
----
+The example uses **synthetic terrain** to check software operation. Its metrics have no scientific interpretation. Full study rasters and prepared training arrays are **not bundled**; see the [data availability statement](docs/DATA.md#availability).
 
-## Contact
+## Method
 
-**Mirza Waleed** (First Author, Developer, & Corresponding Author)  
-Department of Geography, Hong Kong Baptist University  
-Hong Kong Special Administrative Region of China
+- Input: 11 normalized channels — VV, VH, Red, Green, Blue, NIR, FABDEM, HAND, Roads, NDVI and NDWI.
+- Backbone: 6 residual Swin blocks, 4 Swin layers per block, embedding 96, heads 4, window 8.
+- Prediction: `gate * FABDEM_normalized + residual`, converted back to metres.
+- Objective: elevation L1 plus slope, curvature and local differentiable eight-neighbor flow regularization.
+- Inference: overlapping 128 × 128 tiles, stride 64 and cosine blending.
 
-- Website: [waleedgeo.com](https://waleedgeo.com)
-- Email: [waleedgeo@outlook.com](mailto:waleedgeo@outlook.com)
-- GitHub: [@waleedgeo](https://github.com/waleedgeo)
+The flow regularizer does not implement a catchment-scale hydrological solver or guarantee drainage correctness.
 
+<div align="center"><img src="img/PI-SwinIR Graphical Abstract - 1920rescale.png" alt="Graphical abstract" width="100%"></div>
 
----
+## Evaluation context
 
-## Acknowledgments
+The default training setup uses seven development cities and excludes **San Francisco**. Houston is a development city. Validation uses a random 85:15 split of overlapping patches within development cities, which limits generalization claims.
 
-The author gratefully acknowledges the **European Space Agency (ESA)** for providing freely available Sentinel-1 and Sentinel-2 imagery through the Copernicus programme, and the **FABDEM** and **HAND** development teams for their open-access terrain datasets. I also thank the **OpenStreetMap** community for the road network data used in this study.
+Saved San Francisco full-city RMSE is **4.181 m** for PI-SwinIR versus **4.508 m** for FABDEM (7.25% reduction). CNNLite reaches **3.935 m** and UNetLite **4.263 m**. PI-SwinIR does not outperform CNNLite on this holdout elevation metric. See [benchmark context](benchmarks/README.md) for capacity, loss and pixel-mask differences.
 
----
+## Layout
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+```text
+src/             Core model, losses, data pipeline, training and evaluation
+baselines/       Learned CNN/U-Net models and trainer
+checkpoints/     Six trained checkpoints and SHA-256 manifest
+benchmarks/      Saved metrics and training logs
+data/regions/    Study-area GeoJSON boundaries
+scripts/         Synthetic example, verification and baseline evaluation
+docs/            Installation, data, usage and reviewer guides
+```
+
+## Citation and contact
+
+Publication metadata and DOI are pending. Cite this software using [CITATION.cff](CITATION.cff) and record the Git commit used.
+
+**Mirza Waleed**, Department of Geography, Hong Kong Baptist University.
+[waleedgeo@outlook.com](mailto:waleedgeo@outlook.com) · [Website](https://waleedgeo.com) · [GitHub](https://github.com/waleedgeo)
+
+Code uses the existing [MIT license](LICENSE). Third-party datasets retain their own terms; this code license does not grant dataset redistribution rights.

@@ -1,0 +1,17 @@
+# Optional reference L4 environment; requirements.txt supports other builds.
+name: pi-swinir
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pytorch=2.6.0
+  - pytorch-cuda=12.4
+  - rasterio>=1.3
+  - numpy
+  - scipy
+  - matplotlib
+  - joblib
+  - tqdm
+  - pip

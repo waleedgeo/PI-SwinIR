@@ -1,0 +1,74 @@
+[
+  {
+    "file": "checkpoints/best_l4_full.pt",
+    "source": "checkpoints/best_l4_full.pt",
+    "source_sha256": "45cd73982857abb0eac62a339f19fb063cb72e4f5fba2d4af87ab04c72837de3",
+    "sha256": "45cd73982857abb0eac62a339f19fb063cb72e4f5fba2d4af87ab04c72837de3",
+    "bytes": 30847614,
+    "epoch": 12,
+    "profile": "l4_full",
+    "model": "PI-SwinIR",
+    "contains_optimizer": true,
+    "tensor_values_preserved": true
+  },
+  {
+    "file": "checkpoints/best_ablation_l1_only.pt",
+    "source": "results/ablation/checkpoints/best_ablation_l1_only.pt",
+    "source_sha256": "aebf77f2013a09b082ec4831c528b33db1abff044adaf873d8dbbae622a04e3d",
+    "sha256": "458f536078b42fe79a99c07a4be2edecc6d6fbca7b0cb30ac1d18435fd827b14",
+    "bytes": 10271323,
+    "epoch": 8,
+    "profile": "ablation_l1_only",
+    "model": "PI-SwinIR",
+    "contains_optimizer": false,
+    "tensor_values_preserved": true
+  },
+  {
+    "file": "checkpoints/best_ablation_no_flow.pt",
+    "source": "results/ablation/checkpoints/best_ablation_no_flow.pt",
+    "source_sha256": "05e7d769f78e41abd1a93b0ae01aa300c96629c5796935d7ab9eff8395d8548b",
+    "sha256": "6011ab13ef2cf457a8146a9f8f9d0fce92456479bcd66d55d0f0f7cc2a575171",
+    "bytes": 10271323,
+    "epoch": 8,
+    "profile": "ablation_no_flow",
+    "model": "PI-SwinIR",
+    "contains_optimizer": false,
+    "tensor_values_preserved": true
+  },
+  {
+    "file": "checkpoints/best_ablation_no_curv.pt",
+    "source": "results/ablation/checkpoints/best_ablation_no_curv.pt",
+    "source_sha256": "bfe377626fd3766f29fd6176e5b6523ff8bb2277aa78173fff49a5feba33783c",
+    "sha256": "31c773049496f0e80cdbb9e08ad09975bc18c20ab976d75030fe5a5c11269834",
+    "bytes": 10271323,
+    "epoch": 8,
+    "profile": "ablation_no_curv",
+    "model": "PI-SwinIR",
+    "contains_optimizer": false,
+    "tensor_values_preserved": true
+  },
+  {
+    "file": "checkpoints/cnn_lite.pt",
+    "source": "baselines/outputs/cnn_lite/best.pt",
+    "source_sha256": "69ab3dc14da7449e3ecbd6de23cff0c4d59fec340e154996dbfc675f684e6679",
+    "sha256": "8d15162583fcc8c9716681826044a208f0067f636aeb9837f8995341b0814d8b",
+    "bytes": 2404449,
+    "epoch": 15,
+    "profile": null,
+    "model": "cnn_lite",
+    "contains_optimizer": false,
+    "tensor_values_preserved": true
+  },
+  {
+    "file": "checkpoints/unet_lite.pt",
+    "source": "baselines/outputs/unet_lite/best.pt",
+    "source_sha256": "23cc1339eeb4541804d4a974996f4cf6370a6da68279271e1e52e97375d89c08",
+    "sha256": "f399717fd56644e086703e15cbd283445001ed2da1e63155b079e25ea9c3c95e",
+    "bytes": 31122955,
+    "epoch": 15,
+    "profile": null,
+    "model": "unet_lite",
+    "contains_optimizer": false,
+    "tensor_values_preserved": true
+  }
+]

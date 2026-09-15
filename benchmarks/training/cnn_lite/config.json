@@ -1,0 +1,10 @@
+{
+  "model": "cnn_lite",
+  "parameters": 597825,
+  "epochs": 15,
+  "batch_size": 16,
+  "lr": 0.0002,
+  "quick": false,
+  "seed": 42,
+  "loss": "L1"
+}

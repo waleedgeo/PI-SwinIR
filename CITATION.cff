@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "Cite this software and record the Git commit used. Publication metadata are pending."
+type: software
+title: "PI-SwinIR: Physics-Informed DEM Vertical Refinement"
+authors:
+  - family-names: Waleed
+    given-names: Mirza
+    affiliation: "Department of Geography, Hong Kong Baptist University"
+repository-code: "https://github.com/waleedgeo/PI-SwinIR"
+url: "https://github.com/waleedgeo/PI-SwinIR"
+license: MIT

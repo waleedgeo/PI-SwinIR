@@ -1,0 +1,10 @@
+{
+  "model": "unet_lite",
+  "parameters": 7765345,
+  "epochs": 15,
+  "batch_size": 16,
+  "lr": 0.0002,
+  "quick": false,
+  "seed": 42,
+  "loss": "L1"
+}
