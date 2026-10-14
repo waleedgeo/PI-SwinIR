@@ -7,7 +7,11 @@
 3. Inspect architecture/loss/config source, checkpoint manifest, saved metrics and training logs.
 4. With original prepared rasters, rerun inference/evaluation using identical extent/grid/masks/software. Prepared arrays enable fresh training with supplied profiles.
 
-## Limits
+## Experiment protocols
+
+The root `src/` implementation and released production checkpoints reproduce the historical recipe. The revision's `experiments/sydney_backbone/` directory contains a separate matched U-Net/Swin comparison with mask-aware training, a corrected local downslope objective, buffered spatial partitions and common evaluation support. Its results do not retroactively change the production checkpoints or historical city scores. Record which implementation and checkpoint a result uses.
+
+## Data and reproduction scope
 
 This provides the base computational materials. Full study rasters, complete original acquisition/export scripts and a permanent data archive are absent; all paper results cannot yet be reconstructed from one public download. Synthetic data only check software. Private manuscript/review notes, paper figure generators and wider hydrology/revision workflows are outside this core release.
 
@@ -19,7 +23,7 @@ The actual prediction is `gate * FABDEM + residual`. Terrain losses use normaliz
 
 The repository copy keeps architecture, weights and objectives, while configuring local data roots, disabling author-bucket uploads by default, honoring explicit city output paths, resolving Sydney reference filenames, exposing device/batch size, separating diagnostic outputs and fixing tile coverage below one tile. Fixed-path manuscript plotting and placeholder baseline-evaluation scripts were omitted. These changes do not alter the active research workspace or retroactively recompute historical scores.
 
-Final public review also removed the obsolete scaled-export validator and internal revision labels, updated utility examples to the released profile, and corrected diagnostic plotting to use prepared elevations in metres while preserving valid zero elevation. Plot reference alignment reuses the evaluation loader.
+Diagnostic plotting uses prepared elevations in metres while preserving valid zero elevation. Plot reference alignment reuses the evaluation loader.
 
 Actual checks are recorded in [RELEASE_VALIDATION.md](RELEASE_VALIDATION.md). For future runs record Git commit, checkpoint checksum, environment, input extent/grid/mask and data versions.
 

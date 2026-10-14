@@ -1,4 +1,6 @@
-# Learned baselines
+# Historical L1 learned controls
+
+These CNNLite and UNetLite runs are supporting historical controls. They are separate from the [matched Sydney backbone comparison](../experiments/sydney_backbone/README.md), whose U-Net uses the same gated framework head and corrected terrain objective as Swin V2.
 
 CNNLite: full-resolution residual CNN, 8 residual blocks, **597,825 parameters**. UNetLite: four-level encoder/decoder, base width 32, **7,765,345 parameters**. Both predict a FABDEM-anchored residual using the same 11-channel contract and plain L1 loss.
 

@@ -1,4 +1,4 @@
-# Saved benchmarks
+# Historical manuscript and learned-control records
 
 These are completed historical research outputs, not new evaluations from release assembly.
 
@@ -17,6 +17,8 @@ Seven cities are development; **San Francisco is unseen**. Saved San Francisco r
 | CNNLite | 3.935 | 2.158 |
 | UNetLite | 4.263 | 2.242 |
 
-CNNLite outperforms PI-SwinIR on this holdout elevation metric. Loss/capacity differ; minor valid-pixel-count differences exist across saved model evaluations. This table is a historical comparison, not a new common-mask experiment. Elevation errors/bias are in metres; implementation is in `src.evaluate`.
+These saved evaluations have different model capacities, objectives, selected checkpoint budgets and model-specific valid support. The numerical ordering is descriptive; it does not isolate the backbone under a controlled protocol. Elevation errors and bias are in metres; implementation is in `src.evaluate`. Complete historical outcomes are retained here and in the manuscript's Supplementary Table S5.
+
+The revision's [Sydney backbone comparison](../experiments/sydney_backbone/README.md) is a separate matched experiment with common inputs, objective, splits, budget and evaluation mask. Its two-model [results CSV](../experiments/sydney_backbone/results/comparison.csv) should be used for that specific backbone comparison. It does not replace these San Francisco or eight-city records.
 
 Development metrics do not establish unseen-region performance. Consolidated prior hydrology statistics do not imply that their external extraction workflow is included: the core evaluation module does not reproduce all manuscript hydrology figures or revision analyses. See [reproducibility](../docs/REPRODUCIBILITY.md).

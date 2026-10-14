@@ -2,9 +2,9 @@
 
 # PI-SwinIR
 
-**A Physics-Informed Swin Transformer for Hydrology-Aware Vertical Refinement of Global DEMs from Multimodal Earth Observation Data**
+**A Physics-Informed Swin Transformer for Hydrology-Aware Vertical Refinement of Digital Elevation Models from Multimodal Earth Observation Data**
 
-This repository provides the core computational materials for a manuscript being prepared for submission to *Computers & Geosciences*: model architecture, physics-informed losses, preprocessing, training, tiled inference, evaluation, six trained checkpoints, and CNN/U-Net baselines.
+This repository provides the computational materials for the PI-SwinIR manuscript submitted to *Computers & Geosciences*: architecture, terrain objectives, preprocessing, training, tiled inference, evaluation and trained checkpoints. It also includes the matched Sydney U-Net versus Swin V2 experiment added during revision.
 
 PI-SwinIR refines elevations on a **10 m grid** using FABDEM resampled to that grid and multimodal Earth observation inputs. Its output retains the input grid dimensions.
 
@@ -18,8 +18,8 @@ PI-SwinIR refines elevations on a **10 m grid** using FABDEM resampled to that g
 | [Inference](docs/INFERENCE.md) | Study cities and your own study area |
 | [Weights](checkpoints/README.md) | Six trained models and checksummed provenance |
 | [Reproducibility](docs/REPRODUCIBILITY.md) | Reviewer checks and limitations |
-| [Benchmarks](benchmarks/README.md) | Saved city metrics and training logs |
-| [Baselines](baselines/README.md) | CNNLite and UNetLite |
+| [Sydney backbone comparison](experiments/sydney_backbone/README.md) | Matched protocol, runnable code and two-model CSV |
+| [Historical benchmark records](benchmarks/README.md) | Original city metrics, supporting controls and training qualifications |
 
 ## Quick start
 
@@ -47,17 +47,27 @@ The flow regularizer does not implement a catchment-scale hydrological solver or
 
 <div align="center"><img src="img/PI-SwinIR Graphical Abstract - 1920rescale.png" alt="Graphical abstract" width="100%"></div>
 
-## Evaluation context
+## Manuscript results and Sydney backbone comparison
 
 The default training setup uses seven development cities and excludes **San Francisco**. Houston is a development city. Validation uses a random 85:15 split of overlapping patches within development cities, which limits generalization claims.
 
-Saved San Francisco full-city RMSE is **4.181 m** for PI-SwinIR versus **4.508 m** for FABDEM (7.25% reduction). CNNLite reaches **3.935 m** and UNetLite **4.263 m**. PI-SwinIR does not outperform CNNLite on this holdout elevation metric. See [benchmark context](benchmarks/README.md) for capacity, loss and pixel-mask differences.
+The historical manuscript evaluation reports San Francisco RMSE of **4.181 m** for PI-SwinIR versus **4.508 m** for its paired FABDEM comparator (7.25% reduction). The separate revision experiment compares Swin V2 and U-Net inside the same framework on buffered Sydney test patches:
+
+| Backbone | MAE (m) | RMSE (m) |
+|---|---:|---:|
+| U-Net | 2.446 | 3.595 |
+| Swin V2 | 2.116 | 3.092 |
+
+Swin V2 had **13.99% lower RMSE** under this matched Sydney protocol. Both models used the same eleven inputs, gated head, corrected terrain objective, frozen splits, 50-epoch budget and validation-only checkpoint selection. See the [experiment code and protocol](experiments/sydney_backbone/README.md) and [two-model CSV](experiments/sydney_backbone/results/comparison.csv).
+
+Sydney was selected after exploratory screening and this follow-up uses one seed, so the result supports a local backbone comparison. Historical learned controls use different objectives, capacities, checkpoint budgets and model-specific evaluation support. Their saved scores and provenance are retained in the [historical benchmark record](benchmarks/README.md); they are separate from the matched Sydney comparison.
 
 ## Layout
 
 ```text
 src/             Core model, losses, data pipeline, training and evaluation
-baselines/       Learned CNN/U-Net models and trainer
+experiments/     Matched Sydney backbone comparison
+baselines/       Historical L1 learned controls and trainer
 checkpoints/     Six trained checkpoints and SHA-256 manifest
 benchmarks/      Saved metrics and training logs
 data/regions/    Study-area GeoJSON boundaries
