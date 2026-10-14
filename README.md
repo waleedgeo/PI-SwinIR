@@ -17,7 +17,7 @@ PI-SwinIR refines elevations on a **10 m grid** using FABDEM resampled to that g
 | [Training](docs/TRAINING.md) | Fresh training, resume and ablations |
 | [Inference](docs/INFERENCE.md) | Study cities and your own study area |
 | [Weights](checkpoints/README.md) | Six trained models and checksummed provenance |
-| [Reproducibility](docs/REPRODUCIBILITY.md) | Reviewer checks and limitations |
+| [Reproducibility](docs/REPRODUCIBILITY.md) | Experiment protocols and reproduction checks |
 | [Sydney backbone comparison](experiments/sydney_backbone/README.md) | Matched protocol, runnable code and two-model CSV |
 | [Historical benchmark records](benchmarks/README.md) | Original city metrics, supporting controls and training qualifications |
 
@@ -43,13 +43,13 @@ The example uses **synthetic terrain** to check software operation. Its metrics 
 - Objective: elevation L1 plus slope, curvature and local differentiable eight-neighbor flow regularization.
 - Inference: overlapping 128 × 128 tiles, stride 64 and cosine blending.
 
-The flow regularizer does not implement a catchment-scale hydrological solver or guarantee drainage correctness.
+The flow regularizer matches local terrain structure over two propagation passes. Catchment-scale routing lies outside the definition of this local training objective.
 
 <div align="center"><img src="img/PI-SwinIR Graphical Abstract - 1920rescale.png" alt="Graphical abstract" width="100%"></div>
 
 ## Manuscript results and Sydney backbone comparison
 
-The default training setup uses seven development cities and excludes **San Francisco**. Houston is a development city. Validation uses a random 85:15 split of overlapping patches within development cities, which limits generalization claims.
+The historical training setup uses seven development cities, including Houston, with a random 85:15 split of overlapping development patches. **San Francisco** is held out throughout for geographic evaluation. The separate Sydney experiment uses buffered training, validation and test partitions.
 
 The historical manuscript evaluation reports San Francisco RMSE of **4.181 m** for PI-SwinIR versus **4.508 m** for its paired FABDEM comparator (7.25% reduction). The separate revision experiment compares Swin V2 and U-Net inside the same framework on buffered Sydney test patches:
 

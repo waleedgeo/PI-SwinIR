@@ -27,7 +27,7 @@ Use a **separate `DEM_DATA_ROOT`** for retraining to keep new outputs separate f
 
 Both trainers accept `--device cpu` or `--device cuda`; otherwise they select automatically.
 
-The historical workflow describes a 3-epoch `l4_probe` followed by full training. Probe weights are not included; fresh profile runs cannot establish bit-for-bit reproduction of that trajectory. No full training campaign was rerun during release preparation.
+The historical workflow describes a 3-epoch `l4_probe` followed by full training. Fresh profile runs train from initialization. Reproducing the historical probe-to-full trajectory requires its original probe checkpoint and resume state; those probe weights are not included in this release.
 
 ## Resume
 
@@ -48,4 +48,4 @@ python -m src.train --profile ablation_no_curv
 
 These retain the production architecture and disable selected losses. No retrained No-HAND, No-road or No-gate weight is included.
 
-`--holdout-city Houston` changes city exclusion for a **new** run, not the provenance of released models. Houston is a default development city. Overlapping-patch random validation monitors optimization but does not establish spatial independence. Geographically separated splits/additional excluded cities require new experiments.
+`--holdout-city Houston` sets the excluded city for a **new** run; the released checkpoints retain their recorded training-city configuration. Houston is a default development city. Random overlapping-patch validation monitors optimization within development terrain. The Sydney entry point uses buffered partitions for its local test; other geographic folds are configured and trained as separate experiments.

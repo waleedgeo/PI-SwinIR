@@ -17,7 +17,7 @@ This provides the base computational materials. Full study rasters, complete ori
 
 Production weights are unchanged; compact exports preserve tensor values. No full training or full-city campaign was rerun during assembly. The default split excludes San Francisco and includes Houston in development. Random overlapping-patch validation is spatially dependent; the production file does not embed the full historical resolved split manifest.
 
-The actual prediction is `gate * FABDEM + residual`. Terrain losses use normalized surfaces, and flow propagation is a local two-iteration regularizer. Invalid targets can contribute normalized-zero loss because a separate pixel mask is not used. Normalization clips elevations. These details limit interpretation and transfer to new terrain.
+The historical prediction is `gate * FABDEM + residual`. Terrain losses use normalized surfaces, and flow propagation is a local two-iteration regularizer. Invalid targets can contribute normalized-zero loss because this recipe does not use a separate pixel mask. Its normalization clips elevations. The Sydney entry point applies explicit validity masks, an unclipped affine elevation normalization and metric downslope flow proportions. These settings identify the implementation associated with each result.
 
 ## Public portability adjustments
 

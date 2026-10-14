@@ -13,7 +13,7 @@ Swin had 13.99% lower RMSE and 13.46% lower MAE on 356,605 common valid test cel
 
 Sydney was selected after exploratory five-epoch screening of seven development cities, which favored U-Net in six cities. Other completed London/San Francisco RMSE comparisons also favored U-Net. The Sydney follow-up uses one seed and an already observed holdout, so it supports a local result rather than general backbone superiority. Full experiment records remain retained by the author. This focused release presents the two learned backbones; it does not remove or replace any repository results. No statistical significance or repeated-seed uncertainty is claimed.
 
-The experiment uses the corrected mask-aware objective `cageo-r1-metric-downslope-mfd-p1-v2`, rather than the historical softmax flow proxy. It does not establish the separate value of the physics terms, their interactions, HAND, or stream-network recovery. The flow component uses metric downslope eight-neighbor fractions, power 1, no uphill routing, and two local passes; it is not a basin solver. L1/Sobel/Laplacian terms remain on affine-normalized elevations. Weights are 1/0.1/0.05/0.01.
+The experiment uses the corrected mask-aware objective `cageo-r1-metric-downslope-mfd-p1-v2`. It compares backbones under a fixed full objective; loss-term interactions, HAND contribution and stream-network recovery are separate experimental questions. The flow component uses metric downslope eight-neighbor fractions, power 1, no uphill routing, and two local passes. This finite local stencil defines a supervised structural objective. L1/Sobel/Laplacian terms remain on affine-normalized elevations. Weights are 1/0.1/0.05/0.01.
 
 ## Data and design
 
