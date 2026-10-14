@@ -1,0 +1,2 @@
+# Preserve original source/coordinate bytes used by the recorded SHA-256 checks.
+src/*.py -text
